@@ -1,0 +1,32 @@
+IF OBJECT_ID('dbo.dim_trip') IS NOT NULL 
+BEGIN 
+    DROP EXTERNAL TABLE dbo.fact_trip;
+END
+GO
+
+
+CREATE EXTERNAL TABLE [dbo].[dim_trip] WITH (
+    LOCATION = 'star_schema/dim_trip',
+    DATA_SOURCE = [bikeridersservercontainer_bikeridersserverstorage_dfs_core_windows_net],
+    FILE_FORMAT = [SynapseDelimitedTextFormat]
+
+) AS (
+    SELECT 
+        [trip_id],
+	    [rideable_type],
+	    [started_at],
+	    [ended_at],
+	    [start_station_id],
+	    [end_station_id],
+	    [rider_id]
+
+    FROM 
+        dbo.raw_trip
+
+);
+GO
+
+SELECT 
+    TOP 50 * 
+FROM dbo.dim_trip
+

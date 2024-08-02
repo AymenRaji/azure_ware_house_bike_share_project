@@ -1,0 +1,33 @@
+IF OBJECT_ID('dbo.fact_transaction') IS NOT NULL 
+BEGIN 
+    DROP EXTERNAL TABLE dbo.fact_transaction;
+END
+GO
+
+
+CREATE EXTERNAL TABLE [dbo].[fact_transaction] WITH (
+    LOCATION = 'star_schema/fact_transaction',
+    DATA_SOURCE = [bikeridersservercontainer_bikeridersserverstorage_dfs_core_windows_net],
+    FILE_FORMAT = [SynapseDelimitedTextFormat]
+
+) AS (
+    SELECT 
+        pay.payment_id,
+		rider.rider_id,
+		trip.trip_id,
+		stat.station_id,
+		DATEDIFF(Hour, trip.start_at, trip.end_at),
+		DATEDIFF(YEAR, rider.birth_date, trip.start_at)
+
+    FROM 
+		dbo.dim_payment pay
+        left JOIN dbo.dim_rider rider ON pay.rider_id = rider.rider_id
+		left join dbo.dim_trip trip on trip.rider_id = rider.rider_id
+        LEFT JOIN dbo.dim_station stat on stat.station_id = trip.start_station_id
+);
+GO
+
+SELECT 
+    TOP 50 * 
+FROM dbo.fact_transaction
+

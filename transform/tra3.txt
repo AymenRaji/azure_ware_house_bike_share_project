@@ -1,0 +1,28 @@
+IF OBJECT_ID('dbo.dim_station') IS NOT NULL 
+BEGIN 
+    DROP EXTERNAL TABLE dbo.dim_station;
+END
+GO
+
+
+CREATE EXTERNAL TABLE [dbo].[dim_station] WITH (
+    LOCATION = 'star_schema/dim_station',
+    DATA_SOURCE = [bikeridersservercontainer_bikeridersserverstorage_dfs_core_windows_net],
+    FILE_FORMAT = [SynapseDelimitedTextFormat]
+
+) AS (
+    SELECT 
+        [station_id],
+        [name],
+        [latitude],
+	    [longitude]
+
+    FROM 
+        dbo.raw_station
+);
+GO
+
+SELECT 
+    TOP 50 * 
+FROM dbo.dim_station
+

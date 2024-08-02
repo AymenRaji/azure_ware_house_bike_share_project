@@ -1,0 +1,33 @@
+IF OBJECT_ID('dbo.dim_payment') IS NOT NULL 
+BEGIN 
+    DROP EXTERNAL TABLE dbo.dim_payment;
+END
+GO
+
+
+CREATE EXTERNAL TABLE [dbo].[dim_payment] WITH (
+    LOCATION = 'star_schema/dim_payment',
+    DATA_SOURCE = [bikeridersservercontainer_bikeridersserverstorage_dfs_core_windows_net],
+    FILE_FORMAT = [SynapseDelimitedTextFormat]
+
+) AS (
+    SELECT 
+        payment_id,
+        payment_date,
+        amount,
+        rider_id,
+        DATEPART(DAY, CONVERT(DATE, payment_date)) AS day,
+        DATEPART(MONTH, CONVERT(DATE, payment_date)) AS month,
+        DATEPART(QUARTER, CONVERT(DATE, payment_date)) AS quarter,
+        DATEPART(YEAR, CONVERT(DATE, payment_date)) AS day_of_year,
+        DATEPART(WEEKDAY, CONVERT(DATE, payment_date)) AS day_od_week
+
+    FROM 
+        dbo.raw_payment
+);
+GO
+
+SELECT 
+    TOP 50 * 
+FROM dbo.dim_payment
+

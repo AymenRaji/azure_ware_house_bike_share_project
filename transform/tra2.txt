@@ -1,0 +1,32 @@
+IF OBJECT_ID('dbo.dim_rider') IS NOT NULL 
+BEGIN 
+    DROP EXTERNAL TABLE dbo.dim_rider;
+END
+GO
+
+
+CREATE EXTERNAL TABLE [dbo].[dim_rider] WITH (
+    LOCATION = 'star_schema/dim_rider',
+    DATA_SOURCE = [bikeridersservercontainer_bikeridersserverstorage_dfs_core_windows_net],
+    FILE_FORMAT = [SynapseDelimitedTextFormat]
+
+) AS (
+    SELECT 
+        [rider_id],
+	    [first_name],
+	    [last_name],
+	    [address],
+	    [birth_date],
+	    [account_start_date],
+	    [account_end_date],
+	    [is_member]
+
+    FROM 
+        dbo.raw_rider
+);
+GO
+
+SELECT 
+    TOP 50 * 
+FROM dbo.dim_rider
+
